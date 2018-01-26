@@ -17,15 +17,15 @@
 
 typedef struct _tag_protcol_demo_1 : public IProtcolBase{
     std::string     service_name;
-    int             device_type;
+    int32           device_type;
     std::string     reverse_data;
     
     std::string pack(){
-        return CStaticProtocolBase::pack<std::string, int, std::string>(service_name, device_type, reverse_data);
+        return CStaticProtocolBase::pack<std::string, int32, std::string>(service_name, device_type, reverse_data);
     }
     
     bool unPack(std::string& data){
-        return CStaticProtocolBase::unPack<std::string, int, std::string>(data, service_name, device_type, reverse_data);
+        return CStaticProtocolBase::unPack<std::string, int32, std::string>(data, service_name, device_type, reverse_data);
     }
     
 }protcol_demo_1;
@@ -43,10 +43,10 @@ public:
 
 private:
     std::string     m_service_name;
-    int             m_device_type;
+    int32           m_device_type;
     std::string     m_reverse_data;
     
-    CProtocolBase<std::string, int, std::string>    proto_packer;
+    CProtocolBase<std::string, int32, std::string>    proto_packer;
 }protcol_demo_2;
 
 

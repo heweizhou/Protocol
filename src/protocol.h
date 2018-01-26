@@ -12,6 +12,23 @@
 #include <string>
 #include <memory>
 #include <type_traits>
+#include <inttypes.h>
+
+#if __SIZEOF_LONG__ == 4
+typedef char        char8;
+typedef short       short16;
+typedef float       float32;
+typedef long long   int64;
+typedef int         int32;
+typedef double      double64;
+#elif __SIZEOF_LONG__ == 8
+typedef char        char8;
+typedef short       short16;
+typedef float       float32;
+typedef long        int64;
+typedef int         int32;
+typedef double      double64;
+#endif
 
 class IProtcolBase{
 public:
@@ -30,10 +47,6 @@ public:
         return base->pack();
     }
     
-//    std::string pack(IProtcolBase base){
-//        return base.pack();
-//    }
-    
     std::string pack(IProtcolBase& base){
         return base.pack();
     }
@@ -43,35 +56,40 @@ public:
     }
     
     std::string pack(std::string arg){
-        long len = arg.length();
-        return std::string((char*)&len, sizeof(len)) + arg;
+        int32 len = arg.length();
+        return std::string((char8*)&len, sizeof(len)) + arg;
     }
     
-    std::string pack(float arg){
-        return std::string((char*)&arg, sizeof(arg));
+    std::string pack(float32 arg){
+        return std::string((char8*)&arg, sizeof(arg));
     }
     
-    std::string pack(double arg){
-        return std::string((char*)&arg, sizeof(arg));
+    std::string pack(double64 arg){
+        return std::string((char8*)&arg, sizeof(arg));
     }
     
-    std::string pack(long arg){
-        return std::string((char*)&arg, sizeof(arg));
+    std::string pack(int64 arg){
+        return std::string((char8*)&arg, sizeof(arg));
     }
     
-    std::string pack(int arg){
-        return std::string((char*)&arg, sizeof(arg));
+    std::string pack(int32 arg){
+        return std::string((char8*)&arg, sizeof(arg));
     }
+    
+    std::string pack(char8 arg){
+        return std::string((char8*)&arg, sizeof(arg));
+    }
+    
+    std::string pack(short16 arg){
+        return std::string((char8*)&arg, sizeof(arg));
+    }
+    
 public:
     
     
     bool unPack(std::string& data, IProtcolBase* base){
         return base->unPack(data);
     }
-    
-//    bool unPack(std::string& data, IProtcolBase base){
-//        return base.pack();
-//    }
     
     bool unPack(std::string& data, IProtcolBase& base){
         return base.unPack(data);
@@ -83,71 +101,95 @@ public:
     
     bool unPack(std::string& data, std::string& arg){
         
-        if (data.length() < sizeof(long)) {
+        if (data.length() < sizeof(int32)) {
             return false;
         }
         
-        const char* pBuffer = data.c_str();
-        long len = *(long*)pBuffer;
+        const char8* pBuffer = data.c_str();
+        int32 len = *(int32*)pBuffer;
         
-        if (data.length() < len + sizeof(long)) {
+        if (data.length() < len + sizeof(int32)) {
             return false;
         }
         
-        arg = data.substr(sizeof(long), len);
-        data = data.substr(sizeof(long) + len);
+        arg = data.substr(sizeof(int32), len);
+        data = data.substr(sizeof(int32) + len);
         
         return true;
     }
     
-    bool unPack(std::string& data, float& arg){
+    bool unPack(std::string& data, float32& arg){
         
-        if (data.length() < sizeof(float)) {
+        if (data.length() < sizeof(float32)) {
             return false;
         }
         
-        const char* pBuffer = data.c_str();
-        arg = *(float*)pBuffer;
-        data = data.substr(sizeof(float));
+        const char8* pBuffer = data.c_str();
+        arg = *(float32*)pBuffer;
+        data = data.substr(sizeof(float32));
         
         return true;
     }
     
-    bool unPack(std::string& data, double& arg){
+    bool unPack(std::string& data, double64& arg){
         
-        if (data.length() < sizeof(double)) {
+        if (data.length() < sizeof(double64)) {
             return false;
         }
         
-        const char* pBuffer = data.c_str();
-        arg = *(double*)pBuffer;
-        data = data.substr(sizeof(double));
+        const char8* pBuffer = data.c_str();
+        arg = *(double64*)pBuffer;
+        data = data.substr(sizeof(double64));
         
         return true;
     }
     
-    bool unPack(std::string& data, long& arg){
+    bool unPack(std::string& data, int64& arg){
         
-        if (data.length() < sizeof(long)) {
+        if (data.length() < sizeof(int64)) {
             return false;
         }
         
-        const char* pBuffer = data.c_str();
-        arg = *(long*)pBuffer;
-        data = data.substr(sizeof(long));
+        const char8* pBuffer = data.c_str();
+        arg = *(int64*)pBuffer;
+        data = data.substr(sizeof(int64));
         
         return true;
     }
     
-    bool unPack(std::string& data, int& arg){
+    bool unPack(std::string& data, int32& arg){
         
-        if (data.length() < sizeof(int)) {
+        if (data.length() < sizeof(int32)) {
             return false;
         }
         
-        const char* pBuffer = data.c_str();
-        arg = *(int*)pBuffer;
-        data = data.substr(sizeof(int));
+        const char8* pBuffer = data.c_str();
+        arg = *(int32*)pBuffer;
+        data = data.substr(sizeof(char8));
+        return true;
+    }
+    
+    bool unPack(std::string& data, char8& arg){
+        
+        if (data.length() < sizeof(char8)) {
+            return false;
+        }
+        
+        const char8* pBuffer = data.c_str();
+        arg = *(char8*)pBuffer;
+        data = data.substr(sizeof(char8));
+        return true;
+    }
+    
+    bool unPack(std::string& data, short16& arg){
+        
+        if (data.length() < sizeof(short16)) {
+            return false;
+        }
+        
+        const char8* pBuffer = data.c_str();
+        arg = *(short16*)pBuffer;
+        data = data.substr(sizeof(short16));
         return true;
     }
 };
@@ -170,11 +212,6 @@ public:
 class CStaticProtocolBase
 {
 public: //pack functions
-    
-//    template <class _F>
-//    static std::string pack( typename  std::enable_if<std::is_base_of<IProtcolBase, _F>::value && !std::is_reference<_F>::value, _F>::type __f){
-//        return __f.pack();
-//    }
     
     template <class _F>
     static std::string pack( typename  std::enable_if<std::is_base_of<IProtcolBase, _F>::value, _F>::type& __f){
@@ -199,8 +236,8 @@ public: //pack functions
     
     template <class _F>
     static std::string pack(std::string __f){
-        long len = __f.length();
-        return std::string((char*)&len, sizeof(len)) + __f;
+        int32 len = __f.length();
+        return std::string((char8*)&len, sizeof(len)) + __f;
     }
     
     template <class _F, class... _R>
@@ -229,19 +266,19 @@ public://unpack functions
     template <class _F>
     static bool unPack(std::string& data, std::string& __f){
         
-        if (data.length() < sizeof(long)) {
+        if (data.length() < sizeof(int32)) {
             return false;
         }
         
-        const char* pBuffer = data.c_str();
-        long len = *(long*)pBuffer;
+        const char8* pBuffer = data.c_str();
+        int32 len = *(int32*)pBuffer;
         
-        if (data.length() < len + sizeof(long)) {
+        if (data.length() < len + sizeof(int32)) {
             return false;
         }
         
-        __f = data.substr(sizeof(long), len);
-        data = data.substr(sizeof(long) + len);
+        __f = data.substr(sizeof(int32), len);
+        data = data.substr(sizeof(int32) + len);
         
         return true;
     }
@@ -252,7 +289,7 @@ public://unpack functions
             return false;
         }
         
-        const char* pBuffer = data.c_str();
+        const char8* pBuffer = data.c_str();
         __f = *(_F*)pBuffer;
         data = data.substr(sizeof(_F));
         
@@ -262,6 +299,13 @@ public://unpack functions
     template <class _F, class... _R>
     static bool unPack(std::string& data, _F& __f, _R&... __r){
         return CStaticProtocolBase::unPack<_F>(data, __f) & CStaticProtocolBase::unPack<_R...>(data, __r...);
+    }
+    
+public: //PeekMessage
+    
+    template <class... _R>
+    static bool peek(std::string data, _R&... __r){
+        return CStaticProtocolBase::unPack<_R...>(data, __r...);
     }
     
 };
